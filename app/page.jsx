@@ -10,35 +10,11 @@ import {
   Activity, 
   Users 
 } from "lucide-react";
+import { getLatestNews } from "@/lib/markdown";
 
-export default function HomePage() {
-  // Simulação de últimas notícias da pasta /content/noticias/
-  const latestNews = [
-    {
-      slug: "expansao-infraestrutura-medica",
-      title: "Expansão do Complexo Hospitalar de Biomedicina",
-      date: "18 de Setembro, 2026",
-      department: "Científico & Médico",
-      summary: "Inauguração da nova ala de terapia genômica e resposta médica tática para associados.",
-      badgeColor: "border-brand-emerald text-brand-emerald bg-brand-emerald/10",
-    },
-    {
-      slug: "diretriz-seguranca-perimetral",
-      title: "Atualização no Protocolo de Patrulhamento Urbano",
-      date: "12 de Setembro, 2026",
-      department: "PCGC & ECGC",
-      summary: "Novas unidades autônomas de monitoramento foram implantadas nos perímetros estratégicos.",
-      badgeColor: "border-brand-red text-brand-red bg-brand-red/10",
-    },
-    {
-      slug: "balanco-trimestral-recursos",
-      title: "Relatório de Eficiência Operacional e Inovação",
-      date: "05 de Setembro, 2026",
-      department: "Administrativo",
-      summary: "Galaxy Corporation atinge recorde de autonomia de suprimentos e estabilidade institucional.",
-      badgeColor: "border-brand-cyan text-brand-cyan bg-brand-cyan/10",
-    },
-  ];
+export default async function HomePage() {
+  // Busca dinamicamente os 3 últimos comunicados em /content/noticias
+  const latestNews = getLatestNews(3);
 
   return (
     <div className="space-y-20 pb-16">
@@ -80,7 +56,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Efeito decorativo de grid sci-fi no fundo */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293d15_1px,transparent_1px),linear-gradient(to_bottom,#1f293d15_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
       </section>
 
@@ -162,7 +137,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. NOTÍCIAS & COMUNICADOS OFICIAIS */}
+      {/* 4. NOTÍCIAS & COMUNICADOS OFICIAIS (DINÂMICO) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-galaxy-border pb-4">
           <div>
@@ -182,38 +157,44 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {latestNews.map((news) => (
-            <article
-              key={news.slug}
-              className="flex flex-col justify-between p-6 rounded-xl border border-galaxy-border bg-galaxy-surface/40 hover:border-brand-cyan/50 hover:bg-galaxy-surface/80 transition-all group"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-[11px] font-mono">
-                  <span className={`px-2 py-0.5 rounded border ${news.badgeColor}`}>
-                    {news.department}
-                  </span>
-                  <span className="text-galaxy-muted">{news.date}</span>
+        {latestNews.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {latestNews.map((news) => (
+              <article
+                key={news.slug}
+                className="flex flex-col justify-between p-6 rounded-xl border border-galaxy-border bg-galaxy-surface/40 hover:border-brand-cyan/50 hover:bg-galaxy-surface/80 transition-all group"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-[11px] font-mono">
+                    <span className={`px-2 py-0.5 rounded border ${news.badgeColor}`}>
+                      {news.department}
+                    </span>
+                    <span className="text-galaxy-muted">{news.date}</span>
+                  </div>
+                  <h3 className="text-base font-semibold text-white group-hover:text-brand-cyan transition-colors">
+                    {news.title}
+                  </h3>
+                  <p className="text-xs text-galaxy-muted leading-relaxed">
+                    {news.summary}
+                  </p>
                 </div>
-                <h3 className="text-base font-semibold text-white group-hover:text-brand-cyan transition-colors">
-                  {news.title}
-                </h3>
-                <p className="text-xs text-galaxy-muted leading-relaxed">
-                  {news.summary}
-                </p>
-              </div>
-              <div className="pt-6">
-                <Link
-                  href={`/noticias/${news.slug}`}
-                  className="inline-flex items-center gap-1 text-xs font-mono text-brand-cyan hover:underline"
-                >
-                  Ler postagem
-                  <ArrowRight size={12} />
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+                <div className="pt-6">
+                  <Link
+                    href={`/noticias/${news.slug}`}
+                    className="inline-flex items-center gap-1 text-xs font-mono text-brand-cyan hover:underline"
+                  >
+                    Ler postagem
+                    <ArrowRight size={12} />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 border border-dashed border-galaxy-border rounded-xl text-center font-mono text-xs text-galaxy-muted">
+            Nenhum comunicado encontrado na pasta <code className="text-brand-cyan">/content/noticias</code>.
+          </div>
+        )}
       </section>
 
       {/* 5. ÁREA DO DISCORD */}
@@ -245,5 +226,5 @@ export default function HomePage() {
 
     </div>
   );
-      }
-              
+          }
+          
