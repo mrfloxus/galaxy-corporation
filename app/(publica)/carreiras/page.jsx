@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getAllCareers } from "@/lib/markdown";
 import { Briefcase, MapPin, Building, ShieldCheck, ChevronRight } from "lucide-react";
 
@@ -65,28 +66,15 @@ export default function CarreirasPage() {
                 <p className="text-sm text-galaxy-text/80 leading-relaxed mb-6">
                   {vaga.description}
                 </p>
-
-                {vaga.requirements && vaga.requirements.length > 0 && (
-                  <div className="mb-6 pt-4 border-t border-galaxy-border/50">
-                    <h3 className="text-xs font-mono uppercase tracking-wider text-galaxy-muted mb-3">
-                      Requisitos Mínimos
-                    </h3>
-                    <ul className="list-disc list-inside space-y-1 text-xs md:text-sm text-galaxy-text/70">
-                      {vaga.requirements.map((req, idx) => (
-                        <li key={idx}>{req}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
 
               <div className="pt-4 border-t border-galaxy-border/50 flex justify-end">
-                <button
-                  type="button"
+                <Link
+                  href={`/carreiras/${vaga.slug}`}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand-cyan/10 hover:bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/40 text-xs font-mono uppercase font-bold tracking-wider transition-colors"
                 >
-                  Submeter Credenciais <ChevronRight className="w-4 h-4" />
-                </button>
+                  Ver Detalhes do Cargo <ChevronRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
           ))}
