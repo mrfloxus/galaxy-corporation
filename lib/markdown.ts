@@ -3,6 +3,7 @@ import path from "path";
 import matter from "gray-matter";
 
 const postsDirectory = path.join(process.cwd(), "content/noticias");
+const careersDirectory = path.join(process.cwd(), "content/vagas");
 
 export interface PostData {
   slug: string;
@@ -14,8 +15,19 @@ export interface PostData {
   content: string;
 }
 
+export interface CareerData {
+  slug: string;
+  title: string;
+  department: string;
+  description: string;
+  requirements?: string[];
+  location?: string;
+  type?: string;
+  badgeColor?: string;
+  content: string;
+}
+
 export function getLatestNews(limit = 3): PostData[] {
-  // Cria a pasta se ela ainda não existir
   if (!fs.existsSync(postsDirectory)) {
     return [];
   }
@@ -30,7 +42,6 @@ export function getLatestNews(limit = 3): PostData[] {
 
       const { data, content } = matter(fileContents);
 
-      // Mapeamento dinâmico de cores por departamento
       let badgeColor = "border-brand-cyan text-brand-cyan bg-brand-cyan/10";
       if (data.department?.includes("Médico") || data.department?.includes("Científico")) {
         badgeColor = "border-brand-emerald text-brand-emerald bg-brand-emerald/10";
@@ -49,9 +60,45 @@ export function getLatestNews(limit = 3): PostData[] {
       };
     });
 
-  // Ordena pelas datas mais recentes
   return allPostsData
     .sort((a, b) => (a.date < b.date ? 1 : -1))
     .slice(0, limit);
-        }
+}
 
+export function getAllCareers(): CareerData[] {
+  if (!fs.existsSync(careersDirectory)) {
+    return [];
+  }
+
+  const fileNames = fs.readdirSync(careersDirectory);
+  return fileNames
+    .filter((fileName) => fileName.endsWith(".md") || fileName.endsWith(".mdx"))
+    .map((fileName) => {
+      const slug = fileName.replace(/\.mdx?$/, "");
+      const fullPath = path.join(careersDirectory, fileName);
+      const fileContents = fs.readFileSync(fullPath, "utf8");
+
+      const { data, content } = matter(fileContents);
+
+      let badgeColor = "border-brand-cyan text-brand-cyan bg-brand-cyan/10";
+      if (data.department?.includes("Médico") || data.department?.includes("Biomedicina")) {
+        badgeColor = "border-brand-emerald text-brand-emerald bg-brand-emerald/10";
+      } else if (data.department?.includes("PCGC") || data.department?.includes("ECGC") || data.department?.includes("Segurança")) {
+        badgeColor = "border-brand-red text-brand-red bg-brand-red/10";
+      } else if (data.department?.includes("Financeiro") || data.department?.includes("Bank")) {
+        badgeColor = "border-brand-gold text-brand-gold bg-brand-gold/10";
+      }
+
+      return {
+        slug,
+        title: data.title || "Cargo Não Especificado",
+        department: data.department || "Geral",
+        description: data.description || "",
+        requirements: data.requirements || [],
+        location: data.location || "Setor Operacional Central",
+        type: data.type || "Tempo Integral",
+        badgeColor,
+        content,
+      };
+    });
+          }
