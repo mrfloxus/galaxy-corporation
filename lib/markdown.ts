@@ -95,10 +95,56 @@ export function getAllCareers(): CareerData[] {
         department: data.department || "Geral",
         description: data.description || "",
         requirements: data.requirements || [],
-        location: data.location || "Setor Operacional Central",
-        type: data.type || "Tempo Integral",
+        location: data.location || "Local: depende",
+        type: data.type || "Tempo: depende",
         badgeColor,
         content,
       };
     });
           }
+
+// Adicione esta função ao final do arquivo lib/markdown.ts
+
+export function getCareerBySlug(slug: string): CareerData | null {
+  if (!fs.existsSync(careersDirectory)) {
+    return null;
+  }
+
+  // Tenta encontrar o arquivo .md ou .mdx
+  const realSlug = slug.replace(/\.mdx?$/, "");
+  const fullPathMd = path.join(careersDirectory, `${realSlug}.md`);
+  const fullPathMdx = path.join(careersDirectory, `${realSlug}.mdx`);
+
+  let fullPath = "";
+  if (fs.existsSync(fullPathMd)) {
+    fullPath = fullPathMd;
+  } else if (fs.existsSync(fullPathMdx)) {
+    fullPath = fullPathMdx;
+  } else {
+    return null;
+  }
+
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const { data, content } = matter(fileContents);
+
+  let badgeColor = "border-brand-cyan text-brand-cyan bg-brand-cyan/10";
+  if (data.department?.includes("Médico") || data.department?.includes("Biomedicina")) {
+    badgeColor = "border-brand-emerald text-brand-emerald bg-brand-emerald/10";
+  } else if (data.department?.includes("PCGC") || data.department?.includes("ECGC") || data.department?.includes("Segurança")) {
+    badgeColor = "border-brand-red text-brand-red bg-brand-red/10";
+  } else if (data.department?.includes("Financeiro") || data.department?.includes("Bank")) {
+    badgeColor = "border-brand-gold text-brand-gold bg-brand-gold/10";
+  }
+
+  return {
+    slug: realSlug,
+    title: data.title || "Cargo Não Especificado",
+    department: data.department || "Geral",
+    description: data.description || "",
+    requirements: data.requirements || [],
+    location: data.location || "Local: depende",
+    type: data.type || "Tempo: depende",
+    badgeColor,
+    content,
+  };
+}
