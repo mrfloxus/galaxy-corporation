@@ -1,4 +1,4 @@
-import "@/app/globals.css";
+import "./globals.css"; // <-- Ajustado para caminho relativo
 import { Inter, JetBrains_Mono } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
