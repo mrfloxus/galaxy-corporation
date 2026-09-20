@@ -148,3 +148,44 @@ export function getCareerBySlug(slug: string): CareerData | null {
     content,
   };
 }
+
+// Adicione esta função ao final do arquivo lib/markdown.ts
+
+export function getPostBySlug(slug: string): PostData | null {
+  if (!fs.existsSync(postsDirectory)) {
+    return null;
+  }
+
+  const realSlug = slug.replace(/\.mdx?$/, "");
+  const fullPathMd = path.join(postsDirectory, `${realSlug}.md`);
+  const fullPathMdx = path.join(postsDirectory, `${realSlug}.mdx`);
+
+  let fullPath = "";
+  if (fs.existsSync(fullPathMd)) {
+    fullPath = fullPathMd;
+  } else if (fs.existsSync(fullPathMdx)) {
+    fullPath = fullPathMdx;
+  } else {
+    return null;
+  }
+
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  const { data, content } = matter(fileContents);
+
+  let badgeColor = "border-brand-cyan text-brand-cyan bg-brand-cyan/10";
+  if (data.department?.includes("Médico") || data.department?.includes("Científico")) {
+    badgeColor = "border-brand-emerald text-brand-emerald bg-brand-emerald/10";
+  } else if (data.department?.includes("PCGC") || data.department?.includes("ECGC") || data.department?.includes("Segurança")) {
+    badgeColor = "border-brand-red text-brand-red bg-brand-red/10";
+  }
+
+  return {
+    slug: realSlug,
+    title: data.title || "Comunicado Sem Título",
+    date: data.date || "",
+    department: data.department || "Geral",
+    summary: data.summary || "",
+    badgeColor,
+    content,
+  };
+}
