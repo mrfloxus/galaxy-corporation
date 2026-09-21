@@ -1,7 +1,5 @@
-import "./globals.css"; // <-- Ajustado para caminho relativo
+import "./globals.css";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,14 +26,8 @@ export default function RootLayout({ children }) {
         {/* Efeito visual de tela de monitor */}
         <div className="fixed inset-0 pointer-events-none bg-scanlines opacity-40 z-50" />
         
-        {/* Cabeçalho */}
-        <Navbar />
-
-        {/* Conteúdo dinâmico das páginas */}
-        <main className="flex-1 relative z-10">{children}</main>
-
-        {/* Rodapé */}
-        <Footer />
+        {/* Renderiza os layouts específicos das rotas sem duplicar Navbars */}
+        {children}
       </body>
     </html>
   );
