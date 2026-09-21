@@ -10,45 +10,55 @@ import {
   Coins, 
   TrendingUp, 
   RefreshCw,
-  Award
+  Award,
+  Loader2
 } from "lucide-react";
 
 export default function DashboardPage() {
-  // Estado simulado do usuário logado (em produção vem do cookie/session)
-  const [usuario, setUsuario] = useState({
-    nome: "Operador Especial",
-    departamento: "Operações Táticas",
-    discordId: "123456789012345678", // Exemplo de ID para puxar do UnbelievaBoat
-  });
+  const [usuario, setUsuario] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   const [leaderboard, setLeaderboard] = useState([]);
   const [loadingEconomy, setLoadingEconomy] = useState(true);
 
-  // Função para buscar o Leaderboard Global do UnbelievaBoat
+  // 1. Carrega dados do usuário autenticado no banco
+  const carregarUsuario = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.authenticated) {
+          setUsuario(data.user);
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados do usuário:", error);
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  // 2. Carrega ranking global direto da API do UnbelievaBoat
   const carregarLeaderboard = async () => {
     setLoadingEconomy(true);
     try {
-      // Faz a chamada para a nossa rota interna de economia que criamos
       const res = await fetch("/api/economy/balance?limit=5");
       if (res.ok) {
         const data = await res.json();
         setLeaderboard(Array.isArray(data) ? data : []);
       } else {
-        // Dados demonstrativos caso a API do bot ainda não tenha o Token configurado
-        setLeaderboard([
-          { user_id: "1", total: 150000, cash: 50000, bank: 100000 },
-          { user_id: "2", total: 98000, cash: 18000, bank: 80000 },
-          { user_id: "3", total: 75000, cash: 25000, bank: 50000 },
-        ]);
+        setLeaderboard([]);
       }
     } catch (error) {
-      console.error("Erro ao carregar ranking de economia:", error);
+      console.error("Erro ao carregar leaderboard:", error);
+      setLeaderboard([]);
     } finally {
       setLoadingEconomy(false);
     }
   };
 
   useEffect(() => {
+    carregarUsuario();
     carregarLeaderboard();
   }, []);
 
@@ -64,7 +74,10 @@ export default function DashboardPage() {
               <span>Sessão Ativa // Criptografada</span>
             </div>
             <h1 className="text-2xl md:text-4xl font-bold text-white tracking-tight">
-              Bem-vindo, <span className="text-brand-cyan">{usuario.nome}</span>
+              Bem-vindo,{" "}
+              <span className="text-brand-cyan">
+                {loadingUser ? "Carregando..." : usuario?.name || "Operador"}
+              </span>
             </h1>
             <p className="text-galaxy-muted text-xs md:text-sm font-mono mt-1">
               Terminal de Operações Central — Galaxy Corporation
@@ -87,7 +100,9 @@ export default function DashboardPage() {
           </div>
           <div>
             <span className="text-[11px] font-mono text-galaxy-muted uppercase tracking-wider block">Agente / Operador</span>
-            <h3 className="text-base font-bold text-white mt-0.5">{usuario.nome}</h3>
+            <h3 className="text-base font-bold text-white mt-0.5">
+              {loadingUser ? "---" : usuario?.name || "Não informado"}
+            </h3>
           </div>
         </div>
 
@@ -97,7 +112,9 @@ export default function DashboardPage() {
           </div>
           <div>
             <span className="text-[11px] font-mono text-galaxy-muted uppercase tracking-wider block">Setor / Departamento</span>
-            <h3 className="text-base font-bold text-white mt-0.5">{usuario.departamento}</h3>
+            <h3 className="text-base font-bold text-white mt-0.5">
+              {loadingUser ? "---" : usuario?.department || "Operações Gerais"}
+            </h3>
           </div>
         </div>
 
@@ -107,7 +124,9 @@ export default function DashboardPage() {
           </div>
           <div>
             <span className="text-[11px] font-mono text-galaxy-muted uppercase tracking-wider block">Nível de Acesso</span>
-            <h3 className="text-base font-bold text-brand-gold mt-0.5 font-mono uppercase">{usuario.cargo}</h3>
+            <h3 className="text-base font-bold text-brand-gold mt-0.5 font-mono uppercase">
+              {loadingUser ? "---" : usuario?.role || "RECRUTA"}
+            </h3>
           </div>
         </div>
       </div>
@@ -138,15 +157,15 @@ export default function DashboardPage() {
           </button>
         </div>
 
-        {/* Tabela / Lista do Ranking */}
+        {/* Tabela do Ranking */}
         {loadingEconomy ? (
           <div className="py-12 text-center text-xs font-mono text-galaxy-muted flex flex-col items-center gap-3">
-            <RefreshCw className="w-6 h-6 animate-spin text-brand-cyan" />
-            <span>Carregando dados da rede UnbelievaBoat...</span>
+            <Loader2 className="w-6 h-6 animate-spin text-brand-cyan" />
+            <span>Consultando dados na API do UnbelievaBoat...</span>
           </div>
         ) : leaderboard.length === 0 ? (
           <div className="py-8 text-center text-xs font-mono text-galaxy-muted">
-            Nenhum registro de economia encontrado no momento.
+            Nenhum registro de economia encontrado no momento. Verifique as variáveis MONGODB_URI e UNBELIEVABOAT_TOKEN na Vercel.
           </div>
         ) : (
           <div className="space-y-3">
@@ -180,7 +199,7 @@ export default function DashboardPage() {
                         ID: {item.user_id}
                       </span>
                       <span className="text-[11px] font-mono text-galaxy-muted">
-                        Membro Ativo do Servidor
+                        Membro do Servidor
                       </span>
                     </div>
                   </div>
@@ -207,5 +226,5 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-}
-
+      }
+              
