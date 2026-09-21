@@ -14,7 +14,7 @@ export default function LoginPage() {
     name: "",
     email: "",
     password: "",
-    department: "Operações Táticas",
+    department: "Departamento Médico",
   });
 
   const handleChange = (e) => {
@@ -128,11 +128,14 @@ export default function LoginPage() {
                     onChange={handleChange}
                     className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-black/40 border border-galaxy-border focus:border-brand-cyan focus:outline-none text-sm text-white"
                   >
-                    <option value="Operações Táticas">Operações Táticas</option>
-                    <option value="Engenharia & Pesquisa">Engenharia & Pesquisa</option>
-                    <option value="Divisão Médica">Divisão Médica</option>
-                    <option value="Segurança Interna (PCGC)">Segurança Interna (PCGC)</option>
-                    <option value="Diretoria Central">Diretoria Central</option>
+                    <option value="Departamento Científico">Departamento Científico</option>
+                    <option value="Departamento Médico">Departamento Médico</option>
+                    <option value="Departamento Logístico">Departamento Logístico</option>
+                    <option value="Departamento de Inteligência">Departamento Logístico</option>
+                    <option value="Departamento de Segurança">Departamento de Segurança</option>
+                    <option value="Departamento Administrativo">Departamento Administrativo</option>
+                    <option value="PCGC">PCGC</option>
+                    <option value="ECGC">ECGC</option>
                   </select>
                 </div>
               </div>
@@ -141,7 +144,7 @@ export default function LoginPage() {
 
           <div>
             <label className="block text-xs font-mono text-galaxy-muted mb-1.5 uppercase">
-              E-mail Corporativo
+              E-mail
             </label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-galaxy-muted" />
@@ -201,7 +204,7 @@ export default function LoginPage() {
                 onClick={() => setModo("registro")}
                 className="text-brand-cyan font-bold hover:underline"
               >
-                Solicitar Credencial
+                Cadastrar-se
               </button>
             </p>
           ) : (
